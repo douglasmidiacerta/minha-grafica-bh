@@ -837,14 +837,18 @@
         // ========================================
         
         function enviarParaWhatsApp() {
-            const mensagem = `Olá! Quero orçamento de PANFLETOS.
+            const precoAtual = document.getElementById('precoEstimado').textContent;
+            
+            const mensagem = `Olá! Quero finalizar o pedido de PANFLETOS.
 
-📋 *Configuração:*
+📋 Configuração:
 Tamanho: ${configuracao.tamanho}
 Papel: ${configuracao.papel}
 Impressão: ${configuracao.impressao}
 Acabamento: ${configuracao.acabamento}
 Quantidade: ${configuracao.quantidade.toLocaleString('pt-BR')} unidades
+
+💰 Valor estimado: ${precoAtual}
 
 Enviado pelo site Minha Gráfica BH.`;
             
