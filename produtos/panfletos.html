@@ -708,12 +708,36 @@
         
         const phoneNumber = '553198422214';
         
-        // Tabela de preços estimados (simplificada)
+        // Tabela de preços baseada em valores reais do mercado
         const tabelaPrecos = {
-            'A6': { base: 150, multiplicador: 1 },
-            'A5': { base: 250, multiplicador: 1.5 },
-            'A4': { base: 350, multiplicador: 2 },
-            'Personalizado': { base: 300, multiplicador: 1.8 }
+            'A6': {
+                1000: { '4x0': 105.99, '4x4': 158.99, '1x0': 89.99, '1x1': 125.99 },
+                2000: { '4x0': 155.99, '4x4': 233.99, '1x0': 132.99, '1x1': 185.99 },
+                2500: { '4x0': 176.99, '4x4': 265.49, '1x0': 150.49, '1x1': 211.49 },
+                5000: { '4x0': 264.99, '4x4': 397.49, '1x0': 225.24, '1x1': 316.49 },
+                10000: { '4x0': 492.99, '4x4': 739.49, '1x0': 419.04, '1x1': 590.49 }
+            },
+            'A5': {
+                1000: { '4x0': 145.99, '4x4': 218.99, '1x0': 124.09, '1x1': 174.59 },
+                2000: { '4x0': 214.99, '4x4': 322.49, '1x0': 182.74, '1x1': 257.24 },
+                2500: { '4x0': 243.99, '4x4': 365.99, '1x0': 207.39, '1x1': 291.99 },
+                5000: { '4x0': 365.49, '4x4': 548.24, '1x0': 310.67, '1x1': 437.21 },
+                10000: { '4x0': 679.99, '4x4': 1019.99, '1x0': 577.99, '1x1': 813.99 }
+            },
+            'A4': {
+                1000: { '4x0': 199.99, '4x4': 299.99, '1x0': 169.99, '1x1': 239.99 },
+                2000: { '4x0': 294.99, '4x4': 442.49, '1x0': 250.74, '1x1': 353.24 },
+                2500: { '4x0': 334.99, '4x4': 502.49, '1x0': 284.74, '1x1': 401.24 },
+                5000: { '4x0': 501.99, '4x4': 752.99, '1x0': 426.69, '1x1': 601.99 },
+                10000: { '4x0': 933.99, '4x4': 1400.99, '1x0': 793.89, '1x1': 1117.99 }
+            },
+            'Personalizado': {
+                1000: { '4x0': 175.99, '4x4': 263.99, '1x0': 149.59, '1x1': 210.59 },
+                2000: { '4x0': 259.99, '4x4': 389.99, '1x0': 220.99, '1x1': 311.99 },
+                2500: { '4x0': 295.99, '4x4': 443.99, '1x0': 251.59, '1x1': 354.79 },
+                5000: { '4x0': 443.99, '4x4': 665.99, '1x0': 377.39, '1x1': 531.59 },
+                10000: { '4x0': 825.99, '4x4': 1238.99, '1x0': 702.09, '1x1': 989.99 }
+            }
         };
         
         // ========================================
@@ -814,30 +838,81 @@
         }
         
         function atualizarPreco() {
-            // Cálculo simplificado de preço
-            const basePreco = tabelaPrecos[configuracao.tamanho]?.base || 200;
-            const multiplicador = tabelaPrecos[configuracao.tamanho]?.multiplicador || 1;
+            // Buscar preço na tabela
+            const tamanhoPrecos = tabelaPrecos[configuracao.tamanho];
+            if (!tamanhoPrecos) {
+                document.getElementById('precoEstimado').textContent = 'Sob consulta';
+                return;
+            }
             
-            let preco = basePreco * multiplicador;
+            // Encontrar quantidade mais próxima na tabela
+            const quantidades = Object.keys(tamanhoPrecos).map(Number).sort((a, b) => a - b);
+            let qtdEscolhida = quantidades[0];
             
-            // Ajuste por quantidade
-            const qtdFator = configuracao.quantidade / 1000;
-            preco = preco * qtdFator;
+            for (let qtd of quantidades) {
+                if (configuracao.quantidade >= qtd) {
+                    qtdEscolhida = qtd;
+                } else {
+                    break;
+                }
+            }
             
+            // Se quantidade for maior que o máximo, fazer interpolação
+            if (configuracao.quantidade > quantidades[quantidades.length - 1]) {
+                qtdEscolhida = quantidades[quantidades.length - 1];
+                const fator = configuracao.quantidade / qtdEscolhida;
+                const precoBase = tamanhoPrecos[qtdEscolhida][configuracao.impressao] || 200;
+                let preco = precoBase * fator * 0.85; // Desconto por volume
+                
+                // Ajustes
+                preco = aplicarAjustes(preco);
+                
+                document.getElementById('precoEstimado').textContent = `R$ ${preco.toFixed(2).replace('.', ',')}`;
+                return;
+            }
+            
+            // Buscar preço base
+            let preco = tamanhoPrecos[qtdEscolhida][configuracao.impressao];
+            
+            if (!preco) {
+                // Se não encontrar o tipo de impressão, estimar
+                preco = tamanhoPrecos[qtdEscolhida]['4x0'] || 150;
+                if (configuracao.impressao === '4x4') preco *= 1.5;
+                if (configuracao.impressao === '1x0') preco *= 0.85;
+                if (configuracao.impressao === '1x1') preco *= 1.2;
+            }
+            
+            // Interpolar se quantidade não for exata
+            if (configuracao.quantidade !== qtdEscolhida && qtdEscolhida !== quantidades[quantidades.length - 1]) {
+                const proxQtd = quantidades[quantidades.indexOf(qtdEscolhida) + 1];
+                if (proxQtd) {
+                    const precoProx = tamanhoPrecos[proxQtd][configuracao.impressao] || preco * 1.5;
+                    const fatorInterpolacao = (configuracao.quantidade - qtdEscolhida) / (proxQtd - qtdEscolhida);
+                    preco = preco + (precoProx - preco) * fatorInterpolacao;
+                }
+            }
+            
+            // Aplicar ajustes de papel e acabamento
+            preco = aplicarAjustes(preco);
+            
+            document.getElementById('precoEstimado').textContent = `R$ ${preco.toFixed(2).replace('.', ',')}`;
+        }
+        
+        function aplicarAjustes(preco) {
             // Ajuste por papel
-            if (configuracao.papel.includes('115g')) preco *= 1.2;
-            if (configuracao.papel.includes('150g')) preco *= 1.4;
-            
-            // Ajuste por impressão
-            if (configuracao.impressao === '4x4') preco *= 1.5;
+            if (configuracao.papel.includes('115g')) preco *= 1.15;
+            if (configuracao.papel.includes('150g')) preco *= 1.30;
+            if (configuracao.papel.includes('Offset')) preco *= 0.90;
             
             // Ajuste por acabamento
             if (configuracao.acabamento !== 'Sem acabamento') {
-                if (configuracao.acabamento.includes('Verniz')) preco *= 1.2;
-                if (configuracao.acabamento.includes('Laminação')) preco *= 1.4;
+                if (configuracao.acabamento === 'Verniz total') preco *= 1.15;
+                if (configuracao.acabamento === 'Verniz localizado') preco *= 1.25;
+                if (configuracao.acabamento === 'Laminação fosca') preco *= 1.35;
+                if (configuracao.acabamento === 'Laminação brilho') preco *= 1.35;
             }
             
-            document.getElementById('precoEstimado').textContent = `R$ ${preco.toFixed(2).replace('.', ',')}`;
+            return preco;
         }
         
         // ========================================
