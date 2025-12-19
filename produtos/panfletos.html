@@ -3,9 +3,356 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panfletos - Minha Gráfica BH</title>
+    <title>Panfletos - Configurador de Impressão | Minha Gráfica BH</title>
+    <meta name="description" content="Configure e compre panfletos personalizados. Escolha tamanho, papel, impressão e acabamento. Orçamento direto no WhatsApp.">
     <link rel="icon" type="image/png" href="../images/favicon.png">
     <link rel="stylesheet" href="../css/style.css">
+    <style>
+        /* ========================================
+           ESTILOS ESPECÍFICOS DO CONFIGURADOR
+           ======================================== */
+        
+        /* Hero com Slider */
+        .produto-hero-novo {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 120px 0 60px;
+            margin-top: 70px;
+        }
+        
+        .produto-hero-container-novo {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: start;
+        }
+        
+        /* Slider de Imagens */
+        .produto-slider {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        .slider-container {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+        }
+        
+        .slider-images {
+            display: flex;
+            transition: transform 0.5s ease;
+            height: 100%;
+        }
+        
+        .slider-image {
+            min-width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #fff;
+        }
+        
+        .slider-nav {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+        
+        .slider-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .slider-dot.active {
+            background: #fff;
+            transform: scale(1.3);
+        }
+        
+        .slider-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.5);
+            color: #fff;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+            z-index: 10;
+        }
+        
+        .slider-arrow:hover {
+            background: rgba(0,0,0,0.7);
+        }
+        
+        .slider-arrow.prev {
+            left: 10px;
+        }
+        
+        .slider-arrow.next {
+            right: 10px;
+        }
+        
+        /* Configurador */
+        .produto-configurador {
+            background: #fff;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .configurador-header h1 {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .configurador-header p {
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+        
+        .config-section {
+            margin-bottom: 2rem;
+        }
+        
+        .config-section h3 {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        .config-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.8rem;
+        }
+        
+        .config-option {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 0.8rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .config-option:hover {
+            border-color: #667eea;
+            background: #f0f2ff;
+        }
+        
+        .config-option.active {
+            border-color: #667eea;
+            background: #667eea;
+            color: #fff;
+        }
+        
+        .config-option-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 0.3rem;
+        }
+        
+        .config-option-desc {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .quantity-input {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .quantity-input input {
+            flex: 1;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .quantity-presets {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.8rem;
+            flex-wrap: wrap;
+        }
+        
+        .quantity-preset {
+            padding: 0.5rem 1rem;
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .quantity-preset:hover {
+            background: #667eea;
+            color: #fff;
+            border-color: #667eea;
+        }
+        
+        /* Barra Fixa Inferior */
+        .barra-fixa-pedido {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #fff;
+            border-top: 2px solid #e0e0e0;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            padding: 1rem 2rem;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+        }
+        
+        .barra-resumo {
+            flex: 1;
+        }
+        
+        .barra-resumo-titulo {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.3rem;
+        }
+        
+        .barra-resumo-texto {
+            font-size: 1rem;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .barra-preco {
+            text-align: right;
+        }
+        
+        .barra-preco-valor {
+            font-size: 1.5rem;
+            color: #FF6B35;
+            font-weight: bold;
+        }
+        
+        .barra-preco-obs {
+            font-size: 0.75rem;
+            color: #999;
+        }
+        
+        .barra-cta {
+            flex-shrink: 0;
+        }
+        
+        .btn-whatsapp-pedido {
+            background: #25D366;
+            color: #fff;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .btn-whatsapp-pedido:hover {
+            background: #1fb855;
+            transform: scale(1.05);
+        }
+        
+        /* Seção Galeria */
+        .galeria-produtos {
+            padding: 60px 2rem;
+            background: #f8f9fa;
+        }
+        
+        .galeria-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .galeria-item {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .galeria-item:hover {
+            transform: scale(1.05);
+        }
+        
+        .galeria-item img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+        
+        /* Responsivo */
+        @media (max-width: 768px) {
+            .produto-hero-container-novo {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .barra-fixa-pedido {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            .barra-preco {
+                text-align: left;
+                width: 100%;
+            }
+            
+            .barra-cta {
+                width: 100%;
+            }
+            
+            .btn-whatsapp-pedido {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .config-options {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
 
@@ -30,177 +377,247 @@
         </div>
     </header>
 
-    <!-- Produto Hero -->
-    <section class="produto-hero">
-        <div class="produto-hero-container">
-            <div class="produto-hero-imagem">
-                <img src="../images/produto-panfleto.jpg" alt="Panfletos de alta qualidade">
+    <!-- Hero com Slider e Configurador -->
+    <section class="produto-hero-novo">
+        <div class="produto-hero-container-novo">
+            
+            <!-- Slider de Imagens -->
+            <div class="produto-slider">
+                <div class="slider-container">
+                    <div class="slider-images" id="sliderImages">
+                        <img src="../images/produto-panfleto.jpg" alt="Panfleto Exemplo 1" class="slider-image">
+                        <img src="../images/produto-panfleto.jpg" alt="Panfleto Exemplo 2" class="slider-image">
+                        <img src="../images/produto-panfleto.jpg" alt="Panfleto Exemplo 3" class="slider-image">
+                        <img src="../images/produto-panfleto.jpg" alt="Panfleto Exemplo 4" class="slider-image">
+                    </div>
+                    <button class="slider-arrow prev" id="sliderPrev">‹</button>
+                    <button class="slider-arrow next" id="sliderNext">›</button>
+                    <div class="slider-nav" id="sliderNav"></div>
+                </div>
             </div>
-            <div class="produto-hero-info">
-                <h1>Panfletos</h1>
-                <p class="produto-descricao">Divulgue seu negócio com panfletos de alta qualidade! Ideais para promoções, eventos, lançamentos e muito mais. Impressão colorida e acabamento profissional.</p>
-                <div class="produto-preco-destaque">A partir de R$ 150</div>
-                <a href="https://wa.me/553198422214?text=Olá!%20Gostaria%20de%20orçamento%20para%20PANFLETOS" class="btn-primary">💬 Pedir Orçamento no WhatsApp</a>
-            </div>
-        </div>
-    </section>
 
-    <!-- Especificações -->
-    <section class="produto-especificacoes">
-        <div class="container">
-            <h2>Especificações Técnicas</h2>
-            <div class="especificacoes-grid">
-                <div class="spec-item">
-                    <h3>📏 Tamanhos</h3>
-                    <ul>
-                        <li>A4 (21x29,7cm)</li>
-                        <li>A5 (14,8x21cm)</li>
-                        <li>A6 (10,5x14,8cm)</li>
-                        <li>Tamanhos personalizados</li>
-                    </ul>
+            <!-- Configurador -->
+            <div class="produto-configurador">
+                <div class="configurador-header">
+                    <h1>Panfletos Personalizados</h1>
+                    <p>Configure seu panfleto e receba orçamento instantâneo no WhatsApp</p>
                 </div>
-                <div class="spec-item">
-                    <h3>📄 Papel</h3>
-                    <ul>
-                        <li>Couché 90g</li>
-                        <li>Couché 115g</li>
-                        <li>Couché 150g</li>
-                        <li>Offset 75g</li>
-                    </ul>
+
+                <!-- Tamanho -->
+                <div class="config-section">
+                    <h3>📏 Tamanho</h3>
+                    <div class="config-options" id="tamanhoOptions">
+                        <div class="config-option active" data-value="A6">
+                            <div class="config-option-title">A6</div>
+                            <div class="config-option-desc">10,5x14,8cm</div>
+                        </div>
+                        <div class="config-option" data-value="A5">
+                            <div class="config-option-title">A5</div>
+                            <div class="config-option-desc">14,8x21cm</div>
+                        </div>
+                        <div class="config-option" data-value="A4">
+                            <div class="config-option-title">A4</div>
+                            <div class="config-option-desc">21x29,7cm</div>
+                        </div>
+                        <div class="config-option" data-value="Personalizado">
+                            <div class="config-option-title">Personalizado</div>
+                            <div class="config-option-desc">Sob medida</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="spec-item">
+
+                <!-- Papel -->
+                <div class="config-section">
+                    <h3>📄 Tipo de Papel</h3>
+                    <div class="config-options" id="papelOptions">
+                        <div class="config-option active" data-value="Couché 90g">
+                            <div class="config-option-title">Couché 90g</div>
+                            <div class="config-option-desc">Econômico</div>
+                        </div>
+                        <div class="config-option" data-value="Couché 115g">
+                            <div class="config-option-title">Couché 115g</div>
+                            <div class="config-option-desc">Padrão</div>
+                        </div>
+                        <div class="config-option" data-value="Couché 150g">
+                            <div class="config-option-title">Couché 150g</div>
+                            <div class="config-option-desc">Premium</div>
+                        </div>
+                        <div class="config-option" data-value="Offset 75g">
+                            <div class="config-option-title">Offset 75g</div>
+                            <div class="config-option-desc">Simples</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Impressão -->
+                <div class="config-section">
                     <h3>🎨 Impressão</h3>
-                    <ul>
-                        <li>4x0 (frente colorida)</li>
-                        <li>4x4 (frente e verso colorido)</li>
-                        <li>1x0 (frente preto e branco)</li>
-                        <li>1x1 (frente e verso P&B)</li>
-                    </ul>
+                    <div class="config-options" id="impressaoOptions">
+                        <div class="config-option active" data-value="4x0">
+                            <div class="config-option-title">4x0</div>
+                            <div class="config-option-desc">Frente colorida</div>
+                        </div>
+                        <div class="config-option" data-value="4x4">
+                            <div class="config-option-title">4x4</div>
+                            <div class="config-option-desc">Frente e verso</div>
+                        </div>
+                        <div class="config-option" data-value="1x0">
+                            <div class="config-option-title">1x0</div>
+                            <div class="config-option-desc">1 cor frente</div>
+                        </div>
+                        <div class="config-option" data-value="1x1">
+                            <div class="config-option-title">1x1</div>
+                            <div class="config-option-desc">1 cor ambos</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="spec-item">
+
+                <!-- Acabamento -->
+                <div class="config-section">
                     <h3>✨ Acabamento</h3>
-                    <ul>
-                        <li>Sem acabamento</li>
-                        <li>Verniz total</li>
-                        <li>Verniz localizado</li>
-                        <li>Laminação fosca/brilho</li>
-                    </ul>
+                    <div class="config-options" id="acabamentoOptions">
+                        <div class="config-option active" data-value="Sem acabamento">
+                            <div class="config-option-title">Sem acabamento</div>
+                        </div>
+                        <div class="config-option" data-value="Verniz total">
+                            <div class="config-option-title">Verniz total</div>
+                        </div>
+                        <div class="config-option" data-value="Verniz localizado">
+                            <div class="config-option-title">Verniz localizado</div>
+                        </div>
+                        <div class="config-option" data-value="Laminação fosca">
+                            <div class="config-option-title">Laminação fosca</div>
+                        </div>
+                        <div class="config-option" data-value="Laminação brilho">
+                            <div class="config-option-title">Laminação brilho</div>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- Quantidade -->
+                <div class="config-section">
+                    <h3>🔢 Quantidade</h3>
+                    <div class="quantity-input">
+                        <input type="number" id="quantidadeInput" value="1000" min="100" step="100" placeholder="Digite a quantidade">
+                    </div>
+                    <div class="quantity-presets">
+                        <button class="quantity-preset" data-qty="1000">1.000 un</button>
+                        <button class="quantity-preset" data-qty="2000">2.000 un</button>
+                        <button class="quantity-preset" data-qty="5000">5.000 un</button>
+                        <button class="quantity-preset" data-qty="10000">10.000 un</button>
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
 
-    <!-- Aplicações -->
+    <!-- Onde Usar Panfletos -->
     <section class="produto-aplicacoes">
-        <div class="container">
+        <div class="aplicacoes-container">
             <h2>Onde Usar Panfletos?</h2>
             <div class="aplicacoes-grid">
                 <div class="aplicacao-card">
                     <h3>🏪 Comércio</h3>
-                    <p>Divulgue promoções, inaugurações e ofertas especiais para atrair mais clientes.</p>
+                    <p>Promoções, inaugurações, ofertas especiais e divulgação de produtos.</p>
                 </div>
                 <div class="aplicacao-card">
                     <h3>🎉 Eventos</h3>
-                    <p>Convites para festas, shows, feiras e eventos corporativos.</p>
+                    <p>Festas, shows, palestras, workshops e conferências.</p>
                 </div>
                 <div class="aplicacao-card">
                     <h3>🍕 Delivery</h3>
-                    <p>Cardápios de restaurantes, pizzarias e lanchonetes.</p>
+                    <p>Cardápios, promoções e divulgação de serviços de entrega.</p>
                 </div>
                 <div class="aplicacao-card">
-                    <h3>🏘️ Imobiliárias</h3>
-                    <p>Divulgação de imóveis, lançamentos e empreendimentos.</p>
+                    <h3>🏢 Empresas</h3>
+                    <p>Lançamento de produtos, treinamentos e comunicação interna.</p>
                 </div>
                 <div class="aplicacao-card">
                     <h3>🎓 Educação</h3>
-                    <p>Cursos, palestras, workshops e eventos educacionais.</p>
+                    <p>Matrículas, cursos, palestras educacionais e eventos escolares.</p>
                 </div>
                 <div class="aplicacao-card">
-                    <h3>💼 Serviços</h3>
-                    <p>Apresentação de serviços profissionais e empresariais.</p>
+                    <h3>🏘️ Imobiliárias</h3>
+                    <p>Lançamentos, promoções e divulgação de imóveis.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Prazos e Quantidades -->
-    <section class="produto-tabela">
-        <div class="container">
-            <h2>Prazos e Quantidades</h2>
-            <div class="tabela-precos">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Quantidade</th>
-                            <th>Prazo Padrão</th>
-                            <th>Prazo Express</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>500 unidades</td>
-                            <td>3 dias úteis</td>
-                            <td>24 horas*</td>
-                        </tr>
-                        <tr>
-                            <td>1.000 unidades</td>
-                            <td>3 dias úteis</td>
-                            <td>48 horas*</td>
-                        </tr>
-                        <tr>
-                            <td>2.000 unidades</td>
-                            <td>4 dias úteis</td>
-                            <td>48 horas*</td>
-                        </tr>
-                        <tr>
-                            <td>5.000+ unidades</td>
-                            <td>5 dias úteis</td>
-                            <td>Consulte-nos</td>
-                        </tr>
-                    </tbody>
-                </table>
-                <p class="tabela-nota">*Prazo express disponível mediante consulta e taxa adicional</p>
+    <!-- Galeria de Fotos -->
+    <section class="galeria-produtos">
+        <div class="galeria-container">
+            <h2 style="text-align: center; margin-bottom: 2rem; color: #333; font-size: 2rem;">Trabalhos Realizados</h2>
+            <div class="galeria-grid">
+                <div class="galeria-item">
+                    <img src="../images/produto-panfleto.jpg" alt="Panfleto exemplo 1">
+                </div>
+                <div class="galeria-item">
+                    <img src="../images/produto-panfleto.jpg" alt="Panfleto exemplo 2">
+                </div>
+                <div class="galeria-item">
+                    <img src="../images/produto-panfleto.jpg" alt="Panfleto exemplo 3">
+                </div>
+                <div class="galeria-item">
+                    <img src="../images/produto-panfleto.jpg" alt="Panfleto exemplo 4">
+                </div>
+                <div class="galeria-item">
+                    <img src="../images/produto-panfleto.jpg" alt="Panfleto exemplo 5">
+                </div>
+                <div class="galeria-item">
+                    <img src="../images/produto-panfleto.jpg" alt="Panfleto exemplo 6">
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- CTA Final -->
-    <section class="cta-final">
-        <h2>Pronto para Criar Seus Panfletos?</h2>
-        <p>Fale conosco agora e receba um orçamento personalizado em minutos!</p>
-        <a href="https://wa.me/553198422214?text=Olá!%20Quero%20orçamento%20para%20PANFLETOS" class="btn-whatsapp">💬 Solicitar Orçamento Agora</a>
+    <!-- Depoimentos Específicos -->
+    <section class="depoimentos" style="background: #fff; padding-bottom: 120px;">
+        <div class="depoimentos-container">
+            <h2>Depoimentos de Clientes</h2>
+            <div class="depoimentos-grid">
+                <div class="depoimento-card">
+                    <p class="depoimento-texto">Os panfletos ficaram perfeitos! A qualidade da impressão superou minhas expectativas. Recebi muitos elogios dos clientes.</p>
+                    <p class="depoimento-autor">Ana Paula Silva</p>
+                    <p class="depoimento-cargo">Proprietária - Restaurante Sabor & Arte</p>
+                </div>
+                <div class="depoimento-card">
+                    <p class="depoimento-texto">Entrega rápida e material de primeira qualidade. O acabamento com verniz deixou os panfletos com aspecto profissional.</p>
+                    <p class="depoimento-autor">Carlos Eduardo</p>
+                    <p class="depoimento-cargo">Organizador de Eventos</p>
+                </div>
+                <div class="depoimento-card">
+                    <p class="depoimento-texto">Trabalho impecável! As cores ficaram vibrantes e o papel couché 150g deu um toque premium. Recomendo!</p>
+                    <p class="depoimento-autor">Fernanda Costa</p>
+                    <p class="depoimento-cargo">Marketing - Academia Corpo em Forma</p>
+                </div>
+            </div>
+        </div>
     </section>
 
-    <!-- Footer -->
-    <footer>
-        <div class="footer-container">
-            <div class="footer-section">
-                <h3>Sobre Nós</h3>
-                <p>A Minha Gráfica BH é referência em impressão de qualidade em Belo Horizonte. Atendemos empresas e profissionais com soluções personalizadas e preços competitivos.</p>
-            </div>
-            <div class="footer-section">
-                <h3>Produtos</h3>
-                <ul>
-                    <li><a href="panfletos.html">Panfletos</a></li>
-                    <li><a href="cartoes.html">Cartões de Visita</a></li>
-                    <li><a href="folders.html">Folders</a></li>
-                    <li><a href="banners.html">Banners</a></li>
-                    <li><a href="adesivos.html">Adesivos</a></li>
-                    <li><a href="calendarios.html">Calendários</a></li>
-                    <li><a href="tags.html">Tags e Etiquetas</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h3>Contato</h3>
-                <p>📱 Telefone/WhatsApp:<br>(31) 98422-2214</p>
-                <p>✉️ E-mail:<br>contato@minhagraficabh.com.br</p>
-                <p>📍 Localização:<br>Belo Horizonte - MG</p>
+    <!-- Barra Fixa Inferior -->
+    <div class="barra-fixa-pedido" id="barraFixa">
+        <div class="barra-resumo">
+            <div class="barra-resumo-titulo">Seu pedido:</div>
+            <div class="barra-resumo-texto" id="resumoPedido">
+                Panfleto A6 - Couché 90g - 4x0 - Sem acabamento - 1.000 un.
             </div>
         </div>
-        <div class="footer-bottom">
-            <p>&copy; 2024 Minha Gráfica BH. Todos os direitos reservados.</p>
+        <div class="barra-preco">
+            <div class="barra-preco-valor" id="precoEstimado">R$ 350,00</div>
+            <div class="barra-preco-obs">Valor estimado</div>
         </div>
-    
+        <div class="barra-cta">
+            <button class="btn-whatsapp-pedido" id="btnFinalizarPedido">
+                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"></path>
+                </svg>
+                Finalizar no WhatsApp
+            </button>
+        </div>
+    </div>
+
     <!-- WhatsApp Float e Popup -->
     <button class="whatsapp-float" id="whatsappFloat" aria-label="WhatsApp">
         <svg fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -232,7 +649,7 @@
             <div class="whatsapp-popup-message">
                 <p>Olá! 👋 Como podemos ajudar você hoje?</p>
             </div>
-            <textarea class="whatsapp-popup-textarea" id="whatsappMessage" placeholder="Digite sua mensagem..." rows="3">Olá! Quero saber mais sobre os serviços da gráfica.</textarea>
+            <textarea class="whatsapp-popup-textarea" id="whatsappMessage" placeholder="Digite sua mensagem..." rows="3">Olá! Quero saber mais sobre panfletos.</textarea>
             <button class="whatsapp-popup-button" id="whatsappSend">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"></path>
@@ -242,11 +659,206 @@
             </button>
         </div>
     </div>
-</footer>
 
-    <!-- JavaScript para Interatividade -->
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>Minha Gráfica BH</h3>
+                <p>Soluções completas em impressão gráfica com qualidade e agilidade para seu negócio crescer.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Contato</h3>
+                <p>📱 (31) 98422-2214</p>
+                <p>📍 Belo Horizonte - MG</p>
+            </div>
+            <div class="footer-section">
+                <h3>Produtos</h3>
+                <p><a href="panfletos.html">Panfletos</a></p>
+                <p><a href="cartoes.html">Cartões de Visita</a></p>
+                <p><a href="folders.html">Folders</a></p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Minha Gráfica BH. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
     <script>
-        // Menu Mobile Toggle
+        // ========================================
+        // CONFIGURAÇÃO DO PRODUTO
+        // ========================================
+        
+        const configuracao = {
+            tamanho: 'A6',
+            papel: 'Couché 90g',
+            impressao: '4x0',
+            acabamento: 'Sem acabamento',
+            quantidade: 1000
+        };
+        
+        const phoneNumber = '553198422214';
+        
+        // Tabela de preços estimados (simplificada)
+        const tabelaPrecos = {
+            'A6': { base: 150, multiplicador: 1 },
+            'A5': { base: 250, multiplicador: 1.5 },
+            'A4': { base: 350, multiplicador: 2 },
+            'Personalizado': { base: 300, multiplicador: 1.8 }
+        };
+        
+        // ========================================
+        // SLIDER DE IMAGENS
+        // ========================================
+        
+        let currentSlide = 0;
+        const sliderImages = document.getElementById('sliderImages');
+        const totalSlides = sliderImages.children.length;
+        const sliderNav = document.getElementById('sliderNav');
+        
+        // Criar dots de navegação
+        for (let i = 0; i < totalSlides; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'slider-dot' + (i === 0 ? ' active' : '');
+            dot.addEventListener('click', () => goToSlide(i));
+            sliderNav.appendChild(dot);
+        }
+        
+        function goToSlide(index) {
+            currentSlide = index;
+            sliderImages.style.transform = `translateX(-${currentSlide * 100}%)`;
+            
+            // Atualizar dots
+            document.querySelectorAll('.slider-dot').forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentSlide);
+            });
+        }
+        
+        document.getElementById('sliderPrev').addEventListener('click', () => {
+            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+            goToSlide(currentSlide);
+        });
+        
+        document.getElementById('sliderNext').addEventListener('click', () => {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            goToSlide(currentSlide);
+        });
+        
+        // Auto-play (opcional)
+        setInterval(() => {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            goToSlide(currentSlide);
+        }, 5000);
+        
+        // ========================================
+        // CONFIGURADOR INTERATIVO
+        // ========================================
+        
+        function setupConfigOptions(sectionId, configKey) {
+            const options = document.querySelectorAll(`#${sectionId} .config-option`);
+            options.forEach(option => {
+                option.addEventListener('click', () => {
+                    // Remove active de todos
+                    options.forEach(opt => opt.classList.remove('active'));
+                    // Adiciona active no clicado
+                    option.classList.add('active');
+                    // Atualiza configuração
+                    configuracao[configKey] = option.dataset.value;
+                    // Atualiza resumo e preço
+                    atualizarResumo();
+                    atualizarPreco();
+                });
+            });
+        }
+        
+        setupConfigOptions('tamanhoOptions', 'tamanho');
+        setupConfigOptions('papelOptions', 'papel');
+        setupConfigOptions('impressaoOptions', 'impressao');
+        setupConfigOptions('acabamentoOptions', 'acabamento');
+        
+        // Quantidade
+        const quantidadeInput = document.getElementById('quantidadeInput');
+        quantidadeInput.addEventListener('input', () => {
+            configuracao.quantidade = parseInt(quantidadeInput.value) || 1000;
+            atualizarResumo();
+            atualizarPreco();
+        });
+        
+        // Presets de quantidade
+        document.querySelectorAll('.quantity-preset').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const qty = parseInt(btn.dataset.qty);
+                quantidadeInput.value = qty;
+                configuracao.quantidade = qty;
+                atualizarResumo();
+                atualizarPreco();
+            });
+        });
+        
+        // ========================================
+        // ATUALIZAR RESUMO E PREÇO
+        // ========================================
+        
+        function atualizarResumo() {
+            const resumo = `Panfleto ${configuracao.tamanho} - ${configuracao.papel} - ${configuracao.impressao} - ${configuracao.acabamento} - ${configuracao.quantidade.toLocaleString('pt-BR')} un.`;
+            document.getElementById('resumoPedido').textContent = resumo;
+        }
+        
+        function atualizarPreco() {
+            // Cálculo simplificado de preço
+            const basePreco = tabelaPrecos[configuracao.tamanho]?.base || 200;
+            const multiplicador = tabelaPrecos[configuracao.tamanho]?.multiplicador || 1;
+            
+            let preco = basePreco * multiplicador;
+            
+            // Ajuste por quantidade
+            const qtdFator = configuracao.quantidade / 1000;
+            preco = preco * qtdFator;
+            
+            // Ajuste por papel
+            if (configuracao.papel.includes('115g')) preco *= 1.2;
+            if (configuracao.papel.includes('150g')) preco *= 1.4;
+            
+            // Ajuste por impressão
+            if (configuracao.impressao === '4x4') preco *= 1.5;
+            
+            // Ajuste por acabamento
+            if (configuracao.acabamento !== 'Sem acabamento') {
+                if (configuracao.acabamento.includes('Verniz')) preco *= 1.2;
+                if (configuracao.acabamento.includes('Laminação')) preco *= 1.4;
+            }
+            
+            document.getElementById('precoEstimado').textContent = `R$ ${preco.toFixed(2).replace('.', ',')}`;
+        }
+        
+        // ========================================
+        // ENVIAR PARA WHATSAPP
+        // ========================================
+        
+        function enviarParaWhatsApp() {
+            const mensagem = `Olá! Quero orçamento de PANFLETOS.
+
+📋 *Configuração:*
+Tamanho: ${configuracao.tamanho}
+Papel: ${configuracao.papel}
+Impressão: ${configuracao.impressao}
+Acabamento: ${configuracao.acabamento}
+Quantidade: ${configuracao.quantidade.toLocaleString('pt-BR')} unidades
+
+Enviado pelo site Minha Gráfica BH.`;
+            
+            const encodedMessage = encodeURIComponent(mensagem);
+            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+            window.open(whatsappUrl, '_blank');
+        }
+        
+        document.getElementById('btnFinalizarPedido').addEventListener('click', enviarParaWhatsApp);
+        
+        // ========================================
+        // MENU MOBILE
+        // ========================================
+        
         const menuToggle = document.getElementById('menuToggle');
         const navMenu = document.getElementById('navMenu');
         const navLinks = document.querySelectorAll('.nav-link');
@@ -270,6 +882,14 @@
             }
         });
 
+        const header = document.querySelector('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
         
         // ========================================
         // WHATSAPP POPUP FLUTUANTE
@@ -281,40 +901,30 @@
         const whatsappSend = document.getElementById('whatsappSend');
         const whatsappMessage = document.getElementById('whatsappMessage');
         
-        // Número de WhatsApp (formato internacional sem + e sem espaços)
-        const phoneNumber = '553198422214';
-        
-        // Abrir/Fechar popup ao clicar no botão flutuante
         whatsappFloat.addEventListener('click', () => {
             whatsappPopup.classList.toggle('active');
         });
         
-        // Fechar popup ao clicar no X
         whatsappPopupClose.addEventListener('click', () => {
             whatsappPopup.classList.remove('active');
         });
         
-        // Fechar popup ao clicar fora dele
         document.addEventListener('click', (e) => {
             if (!whatsappPopup.contains(e.target) && !whatsappFloat.contains(e.target)) {
                 whatsappPopup.classList.remove('active');
             }
         });
         
-        // Enviar mensagem para WhatsApp
         whatsappSend.addEventListener('click', () => {
             const message = whatsappMessage.value.trim();
             if (message) {
                 const encodedMessage = encodeURIComponent(message);
                 const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
                 window.open(whatsappUrl, '_blank');
-                
-                // Fechar popup após enviar
                 whatsappPopup.classList.remove('active');
             }
         });
         
-        // Permitir enviar com Enter (Ctrl+Enter para nova linha)
         whatsappMessage.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.ctrlKey && !e.shiftKey) {
                 e.preventDefault();
@@ -322,25 +932,10 @@
             }
         });
         
-        // Mostrar popup automaticamente após 5 segundos (primeira visita)
-        if (!sessionStorage.getItem('whatsappPopupShown')) {
-            setTimeout(() => {
-                whatsappPopup.classList.add('active');
-                sessionStorage.setItem('whatsappPopupShown', 'true');
-            }, 5000);
-        }
-
-        const header = document.querySelector('header');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 100) {
-                header.classList.add('scrolled');
-            } else {
-                header.classList.remove('scrolled');
-            }
-        });
+        // Inicializar
+        atualizarResumo();
+        atualizarPreco();
     </script>
 
 </body>
 </html>
-
-
