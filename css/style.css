@@ -101,7 +101,7 @@ header {
 .logo {
     font-size: 1.2rem;
     font-weight: bold;
-    color: #FF6B35;
+    color: #a5ce37;
     transition: transform 0.3s ease;
     z-index: 1001;
 }
@@ -165,7 +165,7 @@ nav a::after {
     left: 0;
     width: 0;
     height: 2px;
-    background: #FF6B35;
+    background: #a5ce37;
     transition: width 0.3s ease;
 }
 
@@ -174,7 +174,7 @@ nav a:hover::after {
 }
 
 nav a:hover {
-    color: #FF6B35;
+    color: #a5ce37;
 }
 
 .header-contact {
@@ -198,32 +198,12 @@ nav a:hover {
 
 /* Hero Section */
 .hero {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: #fff;
+    background: #f8f9fa;
+    color: #333;
     padding: 80px 2rem 60px;
     margin-top: 0;
     position: relative;
     overflow: hidden;
-}
-
-.hero::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="2" fill="white" opacity="0.1"/></svg>');
-    animation: float 20s infinite linear;
-}
-
-@keyframes float {
-    0% {
-        transform: translateY(0);
-    }
-    100% {
-        transform: translateY(-100px);
-    }
 }
 
 .hero-container {
@@ -247,13 +227,13 @@ nav a:hover {
 .hero-content p {
     font-size: 1.2rem;
     margin-bottom: 2rem;
-    opacity: 0.95;
+    color: #666;
     animation: slideInLeft 1s ease;
 }
 
 .btn-primary {
     display: inline-block;
-    background: #FF6B35;
+    background: #a5ce37;
     color: #fff;
     padding: 1rem 2.5rem;
     border-radius: 30px;
@@ -261,13 +241,14 @@ nav a:hover {
     font-weight: bold;
     font-size: 1.1rem;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+    box-shadow: 0 4px 15px rgba(165, 206, 55, 0.4);
     animation: slideInLeft 1.2s ease;
 }
 
 .btn-primary:hover {
+    background: #91b830;
     transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 8px 25px rgba(255, 107, 53, 0.6);
+    box-shadow: 0 8px 25px rgba(165, 206, 55, 0.6);
 }
 
 .hero-image {
@@ -367,7 +348,7 @@ nav a:hover {
 }
 
 .beneficio-card:hover h3 {
-    color: #FF6B35;
+    color: #a5ce37;
 }
 
 .beneficio-card p {
@@ -452,7 +433,7 @@ nav a:hover {
 /* Preço logo abaixo da imagem */
 .produto-preco {
     font-size: 1.5rem;
-    color: #FF6B35;
+    color: #a5ce37;
     font-weight: bold;
     padding: 1rem 1.5rem 0.5rem;
     text-align: center;
@@ -622,7 +603,7 @@ nav a:hover {
 /* CTA Final */
 .cta-final {
     padding: 80px 2rem;
-    background: linear-gradient(135deg, #FF6B35 0%, #ff8c5a 100%);
+    background: linear-gradient(135deg, #a5ce37 0%, #c0e166 100%);
     color: #fff;
     text-align: center;
 }
@@ -673,7 +654,7 @@ footer {
 }
 
 .footer-section h3 {
-    color: #FF6B35;
+    color: #a5ce37;
     margin-bottom: 1.5rem;
     font-size: 1.3rem;
 }
@@ -696,7 +677,7 @@ footer {
 }
 
 .footer-section a:hover {
-    color: #FF6B35;
+    color: #a5ce37;
 }
 
 .footer-bottom {
@@ -748,7 +729,7 @@ footer {
 
 .produto-preco-destaque {
     font-size: 2.5rem;
-    color: #FF6B35;
+    color: #a5ce37;
     font-weight: bold;
     margin-bottom: 2rem;
 }
